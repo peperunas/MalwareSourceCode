@@ -1,0 +1,7 @@
+bot/main.c
+bot/huawei.c
+bot/jaws.c
+dlr/main.c
+cnc/main.go
+loader/main.c
+loader/headers/config.h

